@@ -2,22 +2,16 @@ import React, {Component} from 'react'
 import SelectionMenu from './components/SelectionMenu'
 import ContentBox from './components/ContentBox'
 
-let data = {"id":102693,"sol":1000,"camera":{"id":20,"name":"FHAZ","rover_id":5,"full_name":"Front Hazard Avoidance Camera"},"img_src":"http://mars.jpl.nasa.gov/msl-raw-images/proj/msl/redops/ods/surface/sol/01000/opgs/edr/fcam/FLB_486265257EDR_F0481570FHAZ00323M_.JPG","earth_date":"2015-05-30","rover":{"id":5,"name":"Curiosity","landing_date":"2012-08-06","launch_date":"2011-11-26","status":"active","max_sol":2540,"max_date":"2019-09-28","total_photos":366206,"cameras":[{"name":"FHAZ","full_name":"Front Hazard Avoidance Camera"},{"name":"NAVCAM","full_name":"Navigation Camera"},{"name":"MAST","full_name":"Mast Camera"},{"name":"CHEMCAM","full_name":"Chemistry and Camera Complex"},{"name":"MAHLI","full_name":"Mars Hand Lens Imager"},{"name":"MARDI","full_name":"Mars Descent Imager"},{"name":"RHAZ","full_name":"Rear Hazard Avoidance Camera"}]}}
-
+let curiosity = require('./curiosity.json')
+let sol1000 = require('./sol1000.json')
+let data = sol1000.photos[0]
 class App extends Component {
   
   constructor() {
     super()
     this.state = {
-      cameras: [
-        'Front Hazard Avoidance Camera',
-        'Navigation Camera',
-        'Mast Camera',
-        'Chemistry and Camera Complex',
-        'Mars Hand Lens Imager',
-        'Mars Descent Imager',
-        'Rear Hazard Avoidance Camera'
-      ],
+      cameras: [],
+      checkBoxes: [],
       img_src: data.img_src,
       photos: '5',
       full_name: data.camera.full_name,
@@ -26,8 +20,39 @@ class App extends Component {
     }
   }
 
+  // functions for checkboxes
+
+  selectAllCheckBoxes = () => {
+    let checkBoxArray = []
+    this.state.cameras.forEach(camera => checkBoxArray.push(true))
+    this.setState({checkBoxes: checkBoxArray})
+  }
+
+  clearAllCheckBoxes = () => {
+    let checkBoxArray = []
+    this.state.cameras.forEach(camera => checkBoxArray.push(false))
+    this.setState({checkBoxes: checkBoxArray})
+  }
+
+  onCheckBoxClick = (target) => {
+    let idx = target.target.value
+    let checkBoxArray = this.state.checkBoxes
+    checkBoxArray[idx] === true ? checkBoxArray[idx] = false : checkBoxArray[idx] = true
+    this.setState({checkBoxes: checkBoxArray})
+  }
+
+
+  // lifecycle methods
+
   componentDidMount() {
     // fetch(https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/photos?sol=${sol}&api_key=DEMO_KEY`)
+    let cameraArray = []
+    let checkBoxArray = []
+    curiosity.rover.cameras.forEach(camera => {
+      cameraArray.push(camera.full_name)
+      checkBoxArray.push(true)
+    })
+    this.setState({cameras: cameraArray, checkBoxes: checkBoxArray})
   }
 
   render() {
@@ -35,6 +60,10 @@ class App extends Component {
       <div>
         <SelectionMenu 
           cameras={this.state.cameras}
+          checkBoxes={this.state.checkBoxes}
+          selectAllCheckBoxes={this.selectAllCheckBoxes}
+          clearAllCheckBoxes={this.clearAllCheckBoxes}
+          onCheckBoxClick={this.onCheckBoxClick}
         />
         <div style={{backgroundColor: 'rgb(122,135,150)'}}>
           <br/>
