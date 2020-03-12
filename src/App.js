@@ -4,7 +4,6 @@ import ContentBox from './components/ContentBox'
 
 let curiosity = require('./curiosity.json')
 let sol1000 = require('./sol1000.json')
-let data = sol1000.photos[0]
 class App extends Component {
   
   constructor() {
@@ -13,11 +12,7 @@ class App extends Component {
       // cameras is an array of objects containing camera name, checkbox value
       // and number of photos
       cameras: [],
-      img_src: data.img_src,
-      photos: '5',
-      full_name: data.camera.full_name,
       sol: ''
-      
     }
   }
 
@@ -53,14 +48,16 @@ class App extends Component {
 
   updateSol = (sol) => {
   // fetch(https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/photos?sol=${sol}&api_key=DEMO_KEY`)
-    let numPhotos = 0
+    let cameraArray = this.state.cameras
     sol1000.photos.forEach(photo => {
-      if (photo.full_name == 'Front Hazard Avoidance Camera') {
-        numPhotos++
+      for (let i = 0; i < cameraArray.length; i++) {
+        if (cameraArray[i].full_name === photo.camera.full_name) {
+          cameraArray[i].photos = cameraArray[i].photos+1
+        }
       }
       
     })
-    this.setState({photos: numPhotos})
+    this.setState({cameras: cameraArray})
   }
 
 
@@ -79,6 +76,8 @@ class App extends Component {
     this.setState({
       cameras: cameraArray, 
       sol: '1000'
+    }, function() {
+      this.updateSol('1000')
     })
   }
 
@@ -97,11 +96,21 @@ class App extends Component {
         />
         <div style={{backgroundColor: 'rgb(122,135,150)'}}>
           <br/>
-          <ContentBox
-            img_src={this.state.img_src}
-            photos={this.state.photos}
-            full_name={this.state.full_name}
-          />
+          {this.state.cameras?
+          this.state.cameras.map((camera, idx) => {
+            if (camera.checked) {
+              return(
+                <ContentBox
+                img_src={camera.samplePhoto}
+                photos={camera.photos}
+                full_name={camera.full_name}
+                key={idx}
+                />
+              )
+            } else return ''
+          })
+          : ''
+          }
           <br/>
         </div>
       </div>
