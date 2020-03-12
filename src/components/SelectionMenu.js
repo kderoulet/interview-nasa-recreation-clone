@@ -14,12 +14,11 @@ const SelectionMenu = (props) => {
                             return(
                             <div key={idx}>
                                 <input type="checkbox" 
-                                    label={camera} 
-                                    checked={props.checkBoxes[idx]}
+                                    checked={camera.checked}
                                     value={idx}
-                                    onClick={props.onCheckBoxClick}
+                                    onChange={props.onCheckBoxClick}
                                     />
-                                <label>{camera}</label>
+                                <label>{camera.full_name}</label>
                             </div>)
                         })
                         :
@@ -29,7 +28,7 @@ const SelectionMenu = (props) => {
             </div>
             <div style={{width: "50%", display: "inline-block"}}>
                 Sol<br/>
-                <input type="text" />
+                <input type="text" value={props.sol} onChange={props.onSolChange}/>
             </div>
 
         </div>

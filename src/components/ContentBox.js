@@ -13,7 +13,7 @@ const ContentBox = (props) => {
             <h2>{props.full_name}</h2>
             Photos: {props.photos}<br/><br/>
             Sample photo: <br/><br/>
-            <img src={props.img_src} />
+            <img alt="sample photo"src={props.img_src} />
         </div>
     )
 }

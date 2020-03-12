@@ -10,12 +10,13 @@ class App extends Component {
   constructor() {
     super()
     this.state = {
+      // cameras is an array of objects containing camera name, checkbox value
+      // and number of photos
       cameras: [],
-      checkBoxes: [],
       img_src: data.img_src,
       photos: '5',
       full_name: data.camera.full_name,
-
+      sol: ''
       
     }
   }
@@ -23,36 +24,62 @@ class App extends Component {
   // functions for checkboxes
 
   selectAllCheckBoxes = () => {
-    let checkBoxArray = []
-    this.state.cameras.forEach(camera => checkBoxArray.push(true))
-    this.setState({checkBoxes: checkBoxArray})
+    let cameraArray = this.state.cameras
+    cameraArray.forEach(camera => camera.checked = true)
+    this.setState({cameras: cameraArray})
   }
 
   clearAllCheckBoxes = () => {
-    let checkBoxArray = []
-    this.state.cameras.forEach(camera => checkBoxArray.push(false))
-    this.setState({checkBoxes: checkBoxArray})
+    let cameraArray = this.state.cameras
+    cameraArray.forEach(camera => camera.checked = false)
+    this.setState({cameras: cameraArray})
   }
 
   onCheckBoxClick = (target) => {
     let idx = target.target.value
-    let checkBoxArray = this.state.checkBoxes
-    checkBoxArray[idx] === true ? checkBoxArray[idx] = false : checkBoxArray[idx] = true
-    this.setState({checkBoxes: checkBoxArray})
+    let cameraArray = this.state.cameras
+    // toggle the value of the checkbox
+    cameraArray[idx].checked === true ? cameraArray[idx].checked = false : cameraArray[idx].checked = true
+    this.setState({checkBoxes: cameraArray})
+  }
+
+  // sol input field functions
+
+  onSolChange = (target) => {
+    let sol = target.target.value
+    this.setState({sol: sol})
+    this.updateSol(sol)
+  }
+
+  updateSol = (sol) => {
+  // fetch(https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/photos?sol=${sol}&api_key=DEMO_KEY`)
+    let numPhotos = 0
+    sol1000.photos.forEach(photo => {
+      if (photo.full_name == 'Front Hazard Avoidance Camera') {
+        numPhotos++
+      }
+      
+    })
+    this.setState({photos: numPhotos})
   }
 
 
   // lifecycle methods
 
   componentDidMount() {
-    // fetch(https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/photos?sol=${sol}&api_key=DEMO_KEY`)
     let cameraArray = []
-    let checkBoxArray = []
     curiosity.rover.cameras.forEach(camera => {
-      cameraArray.push(camera.full_name)
-      checkBoxArray.push(true)
+      let cameraObject = {}
+      cameraObject["full_name"] = camera.full_name
+      cameraObject["checked"] = true
+      cameraObject["photos"] = 0
+      cameraObject["samplePhoto"] = ''
+      cameraArray.push(cameraObject)
     })
-    this.setState({cameras: cameraArray, checkBoxes: checkBoxArray})
+    this.setState({
+      cameras: cameraArray, 
+      sol: '1000'
+    })
   }
 
   render() {
@@ -60,10 +87,13 @@ class App extends Component {
       <div>
         <SelectionMenu 
           cameras={this.state.cameras}
-          checkBoxes={this.state.checkBoxes}
+
           selectAllCheckBoxes={this.selectAllCheckBoxes}
           clearAllCheckBoxes={this.clearAllCheckBoxes}
           onCheckBoxClick={this.onCheckBoxClick}
+
+          sol={this.state.sol}
+          onSolChange={this.onSolChange}
         />
         <div style={{backgroundColor: 'rgb(122,135,150)'}}>
           <br/>
