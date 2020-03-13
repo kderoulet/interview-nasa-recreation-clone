@@ -12,12 +12,21 @@ class App extends Component {
       // cameras is an array of objects containing camera name, checkbox value
       // and number of photos
       cameras: [],
-      sol: ''
+      sol: '',
+      showModal: 'none'
     }
   }
 
-  // functions for checkboxes
+  // functions for 
+  displayModal = () => {
+    this.setState({showModal: 'block'})
+  }
 
+  hideModal = () => {
+    this.setState({showModal: 'none'})
+  }
+
+  // functions for checkboxes
   selectAllCheckBoxes = () => {
     let cameraArray = this.state.cameras
     cameraArray.forEach(camera => camera.checked = true)
@@ -49,13 +58,25 @@ class App extends Component {
   updateSol = (sol) => {
   // fetch(https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/photos?sol=${sol}&api_key=DEMO_KEY`)
     let cameraArray = this.state.cameras
+    for (let i = 0; i < cameraArray.length; i++) {
+      cameraArray[i].photos = 0
+    }
     sol1000.photos.forEach(photo => {
       for (let i = 0; i < cameraArray.length; i++) {
         if (cameraArray[i].full_name === photo.camera.full_name) {
           cameraArray[i].photos = cameraArray[i].photos+1
+          if (!cameraArray[i].samplePhoto) {
+            cameraArray[i].samplePhoto = photo.img_src
+          }
         }
       }
-      
+    })
+      // sort cameraArray to display cameras with photos first
+
+    cameraArray.sort(function(a, b) {
+      if (a.samplePhoto > b.samplePhoto) return -1
+      if (a.samplePhoto === b.samplePhoto) return 0
+      if (a.samplePhoto < b.samplePhoto) return 1
     })
     this.setState({cameras: cameraArray})
   }
@@ -75,7 +96,11 @@ class App extends Component {
     })
     this.setState({
       cameras: cameraArray, 
-      sol: '1000'
+      sol: '1000',
+      maxSol: curiosity.rover.max_sol,
+      name: curiosity.rover.name,
+      launched: curiosity.rover.launch_date,
+      landed: curiosity.rover.landing_date
     }, function() {
       this.updateSol('1000')
     })
@@ -83,9 +108,19 @@ class App extends Component {
 
   render() {
     return (
-      <div>
+      <div style={{fontFamily: "Arial"}}>
+        <h2>{this.state.name} Images </h2>
+        <div style={{fontSize: '12px', marginBottom: '15px'}}>
+        Launched: {this.state.launched}&nbsp;
+        | Landed: {this.state.landed}&nbsp;
+        | Max Sol: {this.state.maxSol}
+        </div>
         <SelectionMenu 
           cameras={this.state.cameras}
+
+          showModal={this.state.showModal}
+          displayModal={this.displayModal}
+          hideModal={this.hideModal}
 
           selectAllCheckBoxes={this.selectAllCheckBoxes}
           clearAllCheckBoxes={this.clearAllCheckBoxes}
@@ -93,8 +128,15 @@ class App extends Component {
 
           sol={this.state.sol}
           onSolChange={this.onSolChange}
+          maxSol={this.state.maxSol}
         />
-        <div style={{backgroundColor: 'rgb(122,135,150)'}}>
+        <div style={{
+          backgroundColor: 'rgb(122,135,150)',
+          minHeight: '100vh',
+          display: 'flex',
+          flexFlow: 'row wrap',
+          padding: '3px'
+        }}>
           <br/>
           {this.state.cameras?
           this.state.cameras.map((camera, idx) => {

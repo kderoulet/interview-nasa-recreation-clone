@@ -1,19 +1,31 @@
 import React from 'react'
 
 const ContentBox = (props) => {
+    let height = props.img_src ? '496px' : '156px'
     return(
         <div style={{
             backgroundColor: '#FFF', 
-            borderRadius: '5px', 
-            width: '33%',
-            margin: '10px',
+            borderRadius: '3px', 
+            width: '255px',
+            margin: '10px 0 10px 20px',
             padding: '10px',
-            display: "inline-block"
         }}>
-            <h2>{props.full_name}</h2>
-            Photos: {props.photos}<br/><br/>
-            Sample photo: <br/><br/>
-            <img alt="sampled"src={props.img_src} />
+            <div style={{
+                height: "60px"
+            }}>
+                <h3>{props.full_name}</h3>
+            </div>
+            <div style={{fontSize: '13px'}}>
+                Photos: {props.photos}<br/><br/>
+                {props.photos? 
+                <div>
+                    Sample photo: <br/><br/>
+                    <img style={{maxWidth: "100%"}} alt="sample"src={props.img_src} />
+                </div>
+                :
+                ""
+                }
+            </div>
         </div>
     )
 }
