@@ -18,11 +18,12 @@ const SelectionMenu = (props) => {
                     borderRadius: '3px', 
                     border: 'none', 
                     backgroundColor: '#fff',
-                    cursor: 'pointer'
+                    cursor: 'pointer',
+                    fontWeight: '500'
                     }}
                  onClick={props.showModal === 'none' ? props.displayModal:props.hideModal}
                  >
-                    {props.cameras.filter(camera => camera.checked === true).length} selected &#9660;
+                    {props.cameras.filter(camera => camera.checked === true).length} Selected &#9660;
                 </div>
                 <div id="modal" style={{
                     backgroundColor: "#fff",

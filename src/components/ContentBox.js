@@ -20,7 +20,7 @@ const ContentBox = (props) => {
                 {props.photos? 
                 <div>
                     Sample photo: <br/><br/>
-                    <img style={{maxWidth: "100%"}} alt="sample"src={props.img_src} />
+                    <img style={{width: "100%"}} alt="sample"src={props.img_src} />
                 </div>
                 :
                 ""

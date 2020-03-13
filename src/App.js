@@ -2,8 +2,8 @@ import React, {Component} from 'react'
 import SelectionMenu from './components/SelectionMenu'
 import ContentBox from './components/ContentBox'
 
-let curiosity = require('./curiosity.json')
-let sol1000 = require('./sol1000.json')
+let curiosityJSON = require('./curiosity.json')
+let solDataJSON = require('./sol1000.json')
 class App extends Component {
   
   constructor() {
@@ -56,12 +56,17 @@ class App extends Component {
   }
 
   updateSol = (sol) => {
-  // fetch(https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/photos?sol=${sol}&api_key=DEMO_KEY`)
+  fetch(`https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/photos?sol=${sol}&api_key=DEMO_KEY`)
+  .then(response => {
+    return response.json()
+  })
+  .then((solDataRes) => {
     let cameraArray = this.state.cameras
     for (let i = 0; i < cameraArray.length; i++) {
       cameraArray[i].photos = 0
     }
-    sol1000.photos.forEach(photo => {
+    let solData = solDataJSON.ok ? solDataRes : solDataJSON
+    solData.photos.forEach(photo => {
       for (let i = 0; i < cameraArray.length; i++) {
         if (cameraArray[i].full_name === photo.camera.full_name) {
           cameraArray[i].photos = cameraArray[i].photos+1
@@ -74,18 +79,29 @@ class App extends Component {
       // sort cameraArray to display cameras with photos first
 
     cameraArray.sort(function(a, b) {
-      if (a.samplePhoto > b.samplePhoto) return -1
-      if (a.samplePhoto === b.samplePhoto) return 0
-      if (a.samplePhoto < b.samplePhoto) return 1
+      if (a.photos > b.photos) return -1
+      if (a.photos === b.photos) return 0
+      if (a.photos < b.photos) return 1
     })
+    console.log(cameraArray)
     this.setState({cameras: cameraArray})
-  }
+
+    // }
+  })
+}
 
 
   // lifecycle methods
 
   componentDidMount() {
     let cameraArray = []
+    fetch('https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/?api_key=DEMO_KEY')
+    .then((response) => {
+      return response.json()
+    })
+    .then((curiosityData) => {
+    let curiosity = curiosityData.ok ? curiosityData : curiosityJSON
+    
     curiosity.rover.cameras.forEach(camera => {
       let cameraObject = {}
       cameraObject["full_name"] = camera.full_name
@@ -104,7 +120,8 @@ class App extends Component {
     }, function() {
       this.updateSol('1000')
     })
-  }
+  })
+}
 
   render() {
     return (
